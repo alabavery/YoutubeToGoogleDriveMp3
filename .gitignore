@@ -16,3 +16,7 @@ gradlew.bat
 
 tokens/StoredCredential
 src/main/resources/credentials.json
+
+secrets
+downloads_temp
+temp

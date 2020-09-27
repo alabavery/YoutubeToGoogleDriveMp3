@@ -21,11 +21,11 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
-
-import java.util.Optional;
-
+import java.util.Scanner;
 
 public class DriveService {
+    private static final String BASE_DRIVE_FOLDER_ID_FILE = "secrets/BASE_DRIVE_FOLDER_ID.txt";
+
     private Drive drive;
     private static final String APPLICATION_NAME = "Google Drive API Java Quickstart";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -46,6 +46,28 @@ public class DriveService {
                 .build();
     }
 
+    public DriveFolder[] getFolders() throws IOException {
+        String baseFolderId = DriveService.getBaseFolderId();
+        // Print the names and IDs for up to 10 files.
+        FileList result = this.drive.files().list()
+                .setQ("'" + baseFolderId + "' in parents and mimeType = 'application/vnd.google-apps.folder'")
+                .setPageSize(50)
+                // the fields set here determine what comes back in the response - and therefore which getters will return non-null data
+                .setFields("nextPageToken, files(id, name)")
+                .execute();
+        List<File> files = result.getFiles();
+        DriveFolder[] folders = new DriveFolder[files.size()];
+
+        if (files == null || files.isEmpty()) {
+            System.out.println("No files found.");
+        } else {
+            for (int i = 0; i < files.size(); i++) {
+                folders[i] = new DriveFolder(files.get(i).getId(), files.get(i).getName());
+            }
+        }
+        return folders;
+    }
+
     public void upload(String audioFilePath, String desiredName, String folderId) throws IOException, GeneralSecurityException {
         File fileMetadata = new File();
         fileMetadata.setName(desiredName + ".mp3");
@@ -55,6 +77,20 @@ public class DriveService {
         drive.files().create(fileMetadata, mediaContent)
             .setFields("id, parents")
             .execute();
+    }
+
+    private static String getBaseFolderId() {
+        String id = "";
+        try {
+            java.io.File baseFolderIdFile = new java.io.File(DriveService.BASE_DRIVE_FOLDER_ID_FILE);
+            Scanner reader = new Scanner(baseFolderIdFile);
+            id = reader.nextLine();
+            reader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Problem getting base drive folder id from file");
+            e.printStackTrace();
+        }
+        return id;
     }
 
     /**

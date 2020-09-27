@@ -1,8 +1,10 @@
-public class Printer extends Thread {
-    Video[] toPrint;
+import java.util.List;
 
-    public Printer(Video[] toPrintArr) {
-        toPrint = toPrintArr;
+public class Printer extends Thread {
+    List<Video> toPrint;
+
+    public Printer(List<Video> toPrint) {
+        this.toPrint = toPrint;
     }
 
     public void run() {
@@ -11,17 +13,18 @@ public class Printer extends Thread {
                 break;
             }
             try {
-             Thread.sleep(200);   
+             Thread.sleep(2000);   
             } catch (InterruptedException e) {
                 break;
             }
-            System.out.print("\033[H\033[2J");  
-            System.out.flush();
-            System.out.println("values now");
-            for (int i = 0; i < toPrint.length; i++) {
-                System.out.println(toPrint[i].getName());
+            YoutubeToGoogleDriveMp3.clearConsole();
+            for (int i = 0; i < this.toPrint.size(); i++) {
                 System.out.println("------------------------------");
-                System.out.println("Download: " + toPrint[i].getDownloadProgress() + "%\tUpload: " + toPrint[i].getUploadProgress() + "%");
+                System.out.println(this.toPrint.get(i).getName());
+                String downloadString = "Download: " + this.toPrint.get(i).getDownloadProgress() + "%";
+                String uploadString = "Upload: " + this.toPrint.get(i).getUploadProgress() + "%";
+                System.out.println(downloadString + "\t" + uploadString);
+                System.out.println("------------------------------");
             }
         }
     }

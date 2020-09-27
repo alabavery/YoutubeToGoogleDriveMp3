@@ -5,21 +5,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class YoutubeDLService {
-    Pattern percentPattern;
+    private Pattern percentPattern;
+    private Pattern wholeNumberInPercentPattern;
 
     public YoutubeDLService() {
-        percentPattern = Pattern.compile("\\d+.\\d%");
+        this.percentPattern = Pattern.compile("\\d+.\\d%");
+        this.wholeNumberInPercentPattern = Pattern.compile("\\d+(?=[\\.%])");
     }
 
-    public void downloadAndConvertToMp3() {
+    public void downloadAndConvertToMp3(Video video) {
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(
             "python3",
             "/usr/local/bin/youtube-dl",
-            "https://www.youtube.com/watch?v=SDUDlAEv5pU",
+            video.getUrl(),
             "--extract-audio",
             "--audio-format=mp3",
-            "--output=~/bin/temp.mp3"
+            "--output=" + Video.BASE_DIRECTORY + "/" + java.util.UUID.randomUUID() + ".mp3"
         );
         try {
             Process process = processBuilder.start();
@@ -30,17 +32,16 @@ public class YoutubeDLService {
             while ((line = reader.readLine()) != null) {
                 Matcher percentMatcher = percentPattern.matcher(line);
                 if (percentMatcher.find()) {
-                    String group = percentMatcher.group(0);
-                    String withoutPercent = group.substring(0, group.length() - 1);
-                    System.out.println(Double.parseDouble(withoutPercent));
+                    String entirePercent = percentMatcher.group(0);
+                    Matcher integerMatcher = wholeNumberInPercentPattern.matcher(entirePercent);
+                    if (integerMatcher.find()) {
+                        video.setDownloadProgress(Integer.parseInt(integerMatcher.group(0)));
+                    }
                 }
             }
-
             int exitVal = process.waitFor();
             if (exitVal == 0) {
-                System.out.println("Success!");
-                System.out.println(output);
-                System.exit(0);
+                return;
             } else {
                 //abnormal... 
                 System.out.println("Something went wrong");

@@ -12,13 +12,13 @@ public class Worker extends Thread {
     }
 
     public void run() {
-        // todo how do we get output progress from this?
-        youtubeDLService.downloadAndConvertToMp3();
-        try {
-            // todo how do we get output progress from this?
-            driveService.upload(video.getPathToMp3(), video.getName(), video.getTargetDirectory());
-        } catch (Exception e) {
+        System.out.println("worker running");
+        youtubeDLService.downloadAndConvertToMp3(this.video);
+        // try {
+        //     // todo how do we get output progress from this?
+        //     driveService.upload(video.getPathToMp3(), video.getName(), video.getTargetDirectory());
+        // } catch (Exception e) {
 
-        }
+        // }
     }
 }

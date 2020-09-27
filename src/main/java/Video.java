@@ -1,11 +1,13 @@
 public class Video {
-    String url;    
-    String name;
-    String targetDirectory;
-    String pathToLocalMp3;
+    public static final String BASE_DIRECTORY = "downloads_temp";
 
-    int downloadProgress;
-    int uploadProgress;
+    private String url;    
+    private String name;
+    private DriveFolder targetDirectory;
+    private String pathToLocalMp3;
+
+    private int downloadProgress;
+    private int uploadProgress;
 
     public Video() {
         downloadProgress = 0;
@@ -18,7 +20,7 @@ public class Video {
     public String getName() {
         return name;
     }
-    public String getTargetDirectory() {
+    public DriveFolder getTargetDirectory() {
         return targetDirectory;
     }
     public String getPathToMp3() {
@@ -37,7 +39,7 @@ public class Video {
     public void setName(String nameToSetTo) {
         name = nameToSetTo;
     }
-    public void setTargetDirectory(String targetDirectoryToSetTo) {
+    public void setTargetDirectory(DriveFolder targetDirectoryToSetTo) {
         targetDirectory = targetDirectoryToSetTo;
     }
     public void setPathToLocalMp3(String path) {
